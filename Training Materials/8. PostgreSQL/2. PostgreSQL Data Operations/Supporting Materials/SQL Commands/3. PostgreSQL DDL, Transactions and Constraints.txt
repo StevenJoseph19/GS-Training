@@ -1,9 +1,10 @@
+ \! cls
+==============
 Create Database
 ============================
 CREATE DATABASE my_database;
 \c my_database
 \l
-\! clear
 
 ==================================
 
