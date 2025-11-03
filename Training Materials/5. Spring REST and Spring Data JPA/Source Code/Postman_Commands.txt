@@ -1,3 +1,11 @@
+INSERT INTO friend(first_name, last_name) VALUES('Ada', 'Lovelace');
+
+INSERT INTO friend(first_name, last_name) VALUES('Charles', 'Flint');
+
+SELECT * FROM friend;
+
+==========================================
+
 POST http://localhost:8080/friend
 
 ===========================================
