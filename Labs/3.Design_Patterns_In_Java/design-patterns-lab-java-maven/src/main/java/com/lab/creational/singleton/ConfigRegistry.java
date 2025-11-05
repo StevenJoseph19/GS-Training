@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Initialization-on-demand holder idiom.
  * TODO: add get/set methods and discuss testability.
  */
-public class ConfigRegistry {
+public class  ConfigRegistry {
     private final Map<String, String> store = new ConcurrentHashMap<>();
     private ConfigRegistry() {}
     private static class Holder { private static final ConfigRegistry INSTANCE = new ConfigRegistry(); }
