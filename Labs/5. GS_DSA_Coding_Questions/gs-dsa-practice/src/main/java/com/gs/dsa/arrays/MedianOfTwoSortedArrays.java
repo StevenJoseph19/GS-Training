@@ -7,8 +7,12 @@ package com.gs.dsa.arrays;
  * Edge cases: empty one array, skewed sizes, duplicates, negatives.
  */
 public final class MedianOfTwoSortedArrays {
-    private MedianOfTwoSortedArrays() {}
-    /** TODO: Implement optimal partition-based median. */
+    private MedianOfTwoSortedArrays() {
+    }
+
+    /**
+     * TODO: Implement optimal partition-based median.
+     */
     public static double findMedianSortedArrays(int[] a, int[] b) {
         return Double.NaN; // placeholder to force test failure
     }
