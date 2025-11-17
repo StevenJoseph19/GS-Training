@@ -6,7 +6,13 @@ package com.gs.dsa.strings;
  * Edge cases: empty string, all same char, ties (choose earliest start).
  */
 public final class LongestUniformSubstring {
-    private LongestUniformSubstring() {}
-    /** TODO: Implement linear scan of runs. */
-    public static int[] longestUniform(String s) { return new int[]{-2,-2}; }
+    private LongestUniformSubstring() {
+    }
+
+    /**
+     * TODO: Implement linear scan of runs.
+     */
+    public static int[] longestUniform(String s) {
+        return new int[]{-2, -2};
+    }
 }
