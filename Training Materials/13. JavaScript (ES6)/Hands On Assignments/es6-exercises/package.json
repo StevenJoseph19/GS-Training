@@ -1,0 +1,6 @@
+{
+  "name": "es6-exercises-stubs-strict-full",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "scripts": { "start": "node problem_01.js" }
+}
