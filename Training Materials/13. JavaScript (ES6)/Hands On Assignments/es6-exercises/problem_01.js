@@ -11,4 +11,4 @@ function demoHoisting() {
 }
 
 // Test cases (uncomment to run after implementation)
-// demoHoisting();
+demoHoisting();
