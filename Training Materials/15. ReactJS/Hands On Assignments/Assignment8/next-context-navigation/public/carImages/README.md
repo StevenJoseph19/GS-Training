@@ -1,0 +1,1 @@
+# Place car images here (toyota-corolla.jpg, tesla-model3.jpg)
