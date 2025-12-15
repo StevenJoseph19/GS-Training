@@ -1,4 +1,5 @@
-// Problem: Given a string, find the first non-repeating character and return its index. If it does not exist, return -1.
+// Problem: Given a string, find the first non-repeating character and return its index.
+// If it does not exist, return -1.
 // Hints: Use a frequency map to count characters, then scan again.
 // Examples:
 // Input: "leetcode"

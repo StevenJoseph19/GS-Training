@@ -1,0 +1,573 @@
+1. React useEffect Infinite Loop (Stale Dependency)
+
+const [count, setCount] = useState(0);
+
+useEffect(() => {
+  setCount(count + 1);
+}, [count]);
+
+Q: Why does this cause an infinite loop?
+Fix this to run once on mount:-
+
+useEffect(() => {
+  setCount(c => c + 1);
+}, []); // no dependencies, runs only once after first render
+
+=================================================
+
+2. ES6 - Map and Reduce
+
+use .map() and .reduce() to transform this array of objects 
+into a summary object for a dashboard?"
+const users = [
+  { name: 'Alice', role: 'admin' },
+  { name: 'Bob', role: 'editor' },
+  { name: 'Jane', role: 'admin' }
+];
+
+const result = // Implement your code here
+
+// result: { admin: 2, editor: 1 }
+
+====================================================
+3. React.memo and Prop Equality
+
+const data = { name: 'John' };
+return <Child data={data} />;
+
+Q: Why does Child re-render even if the data looks the same?
+A:
+ A new object reference is created on every render. Shallow comparison in React.memo sees it as different.
+ Fix: Memoize data with useMemo:
+const data = useMemo(() => ({ name: 'John' }), []);
+========================================================
+4. useCallback Trap
+
+const handleClick = useCallback(() => {
+  console.log(count);
+}, []);
+
+Q: Will this log the updated count?
+ A:
+ No. count is not in the dependency array, so it captures the initial value (likely 0).
+ Fix: Add count to the dependency array:
+useCallback(() => console.log(count), [count]);
+================================================================
+5.Conditional Rendering Quirk
+
+{isLoggedIn && <Dashboard />}
+
+Q: What if isLoggedIn is 0 or ''?
+ A:
+ React treats 0, '', and false as falsy — so it won’t render <Dashboard />, even if 0 is a valid value.
+ Fix: Be explicit:
+{isLoggedIn === true && <Dashboard />}
+====================================================================
+6. Component Re-render Debugging
+
+<MyComponent onClick={() => console.log("clicked")} />
+
+Q: How to prevent re-renders if onClick is recreated every time?
+ A:
+ Wrap the function in useCallback or define it outside the render body:
+const handleClick = useCallback(() => console.log("clicked"), []);
+<MyComponent onClick={handleClick} />
+
+Or use React.memo on the child component.
+=================================================================
+7. Promises vs. async/await 
+
+Q: Refactor using async/await. 
+
+fetch('/api/user') 
+
+  .then(res => res.json()) 
+
+  .then(data => console.log(data)); 
+
+ 
+const fetchData = async () => { 
+  try { 
+    const res = await fetch('/api/user'); 
+    const data = await res.json(); 
+    console.log(data); 
+  } catch (err) { 
+    console.error(err); 
+  } 
+}; 
+ ========================================================================
+
+8. useCallback Dependency Array 
+
+const handleClick = useCallback(() => { 
+  console.log(count); 
+}, []); 
+ 
+
+Q: Will this log the updated count? 
+
+ A: 
+ No. count is not in the dependency array, so it captures the initial value (likely 0). 
+ Fix: Add count to the dependency array: 
+
+useCallback(() => console.log(count), [count]); 
+ 
+===========================================================================
+
+9.Conditional Rendering Quirk: Returning Zero
+The Question Imagine you have a component that displays a notification count. 
+The count is stored in the count state variable.
+function NotificationBadge({ count }) {
+  return (
+    <div>
+      <p>Notifications</p>
+      {count && <span className="badge">{count}</span>}
+    </div>
+  );
+}
+
+Question:
+
+If count is passed as 0 (meaning no notifications), what will the component render in the browser?
+
+Answer:
+
+React will render the number 0 directly into the DOM instead of rendering the <span> badge element.
+
+The component output will be: <div><p>Notifications</p>0</div>
+
+The Explanation
+In JavaScript, the expression 0 && <span className="badge">0</span> evaluates to the first falsy operand, which is 0.
+
+React handles null, undefined, and false correctly by rendering nothing.
+
+However, React treats the number 0 as a special case: it is a JavaScript falsy value, but React renders it as the string "0" in the DOM.
+
+The Fix
+To explicitly prevent rendering the number 0 when you intend to render nothing, you must ensure the expression evaluates to false, null, or undefined.
+
+Fix 1: Explicit Comparison (Recommended)
+
+Check for a truthy value (i.e., greater than zero).
+
+// Check if count is greater than 0
+{count > 0 && <span className="badge">{count}</span>}
+
+Fix 2: Use the Logical NOT Operator
+
+Convert the falsy value 0 into the boolean true (using !), then back into false (using !!). This works because !!0 is false.
+
+
+// Forces the expression to evaluate to a boolean
+{!!count && <span className="badge">{count}</span>}
+
+
+===========================================================================================
+10. Component Re-render Debugging 
+
+ 
+<MyComponent onClick={() => console.log("clicked")} /> 
+ 
+
+Q: How to prevent re-renders if onClick is recreated every time? 
+
+ A: 
+ Wrap the function in useCallback or define it outside the render body: 
+
+const handleClick = useCallback(() => console.log("clicked"), []); 
+<MyComponent onClick={handleClick} /> 
+ 
+
+Or use React.memo on the child component. 
+===========================================================================================
+11.State Update Race Condition 
+
+<button onClick={() => setCount(count + 1)}>Click</button> 
+ 
+
+Q: Is this safe with rapid clicks? 
+
+A: 
+ Not always. If React batches updates, the count variable might be stale. 
+ Fix: Use updater function: 
+
+setCount(prev => prev + 1); 
+
+ ===========================================================================================
+12. Lazy Initial State 
+
+const [items, setItems] = useState(() => computeInitialItems()); 
+ 
+
+Q: Why is this better than calling computeInitialItems() directly? 
+
+A: 
+ Using a function delays execution until first render only. If you call it directly, it runs on every render, even if state isn't used. 
+ ============================================================================================
+ 13. State & useEffect: Execution Order 
+
+function Demo() { 
+
+  const [count, setCount] = useState(0); 
+
+  
+
+  useEffect(() => { 
+
+    console.log("Effect ran:", count); 
+
+  }, [count]); 
+
+  
+
+  console.log("Rendered:", count); 
+
+  
+
+  return ( 
+
+    <button onClick={() => setCount(count + 1)}>Click</button> 
+
+  ); 
+
+} 
+
+Question: 
+
+What will be logged to the console when the button is clicked? 
+
+Expected Answer: 
+
+On first render: Rendered: 0 → Effect ran: 0 
+
+On click: Rendered: 1 → Effect ran: 1 
+
+So: Render happens before the useEffect. 
+================================================================================
+14. Props and Re-renders 
+
+const Child = React.memo(({ value }) => { 
+
+  console.log("Child render"); 
+
+  return <div>{value}</div>; 
+
+}); 
+  
+
+function Parent() { 
+
+  const [count, setCount] = useState(0); 
+
+  
+
+  return ( 
+
+    <> 
+
+      <button onClick={() => setCount(count + 1)}>Increment</button> 
+
+      <Child value="static" /> 
+
+    </> 
+
+  ); 
+
+} 
+
+Question: 
+
+Will the Child component re-render on every click? 
+
+Expected Answer: 
+
+No. React.memo avoids re-render since prop (value) does not change. 
+=====================================================================================
+15. Callback with Stale State 
+
+function Counter() { 
+
+  const [count, setCount] = useState(0); 
+
+  const handleClick = useCallback(() => { 
+
+    setCount(count + 1); 
+
+  }, []); 
+
+  return <button onClick={handleClick}>Count: {count}</button>; 
+
+} 
+
+Question: 
+
+Will setCount(count + 1) work correctly on every click? 
+
+Answer: 
+
+ No, count is stale (always 0). 
+
+1. The Initial Render (The Snapshot)
+When the Counter component first runs (the initial mount):
+
+The state is initialized: count is 0.
+
+The handleClick function is created using useCallback([], ...):
+
+useCallback sees the empty dependency array ([]) and decides it will never recreate this function instance.
+
+Crucially, the JavaScript closure is created. The function captures the variable environment from that moment in time, freezing the value of count within its definition to 0.
+
+Fix: Use functional update: setCount(c => c + 1); 
+The "Why": 
+Stale Closures
+When you use useCallback with an empty dependency array [], React creates the function instance only once (during the initial mount).Because JavaScript functions "close over" (capture) the variables in their scope when they are defined, handleClick captures the variable count exactly as it existed during that first render: 0.No matter how many times the component re-renders with a new count (1, 2, 3...), the handleClick function instance remains the same "frozen" version from the first render, holding onto the old value of 0.
+The Code Fixes
+There are actually two ways to fix this, though the one you noted (Functional Update) is usually preferred for counters.
+Option 1: Functional State Update (Preferred)
+By passing a function to setCount, you bypass the closure issue. React passes the current state value into the arrow function at the exact moment the update happens.
+const handleClick = useCallback(() => {
+  // 'prevCount' is guaranteed to be the latest state
+  setCount(prevCount => prevCount + 1); 
+}, []); // Dependency array remains empty
+Option 2: Correct Dependency ArrayIf you must use the count variable directly, you must tell useCallback to recreate the function whenever count changes.
+const handleClick = useCallback(() => {
+  setCount(count + 1);
+}, [count]); // Function is recreated every time 'count' changes
+Note: This effectively negates the performance benefit of useCallback if the parent re-renders frequently, as the function reference changes on every click.
+Summary Table
+Approach               Dependency Array     Behavior                                   Result
+Current (Buggy)        []                   Captures count at mount (0).               Stuck at 1.
+Functional Update      []                   Uses current state from React internals.   Correct (1, 2, 3...)
+Dependency Fix         [count]              Recreates function when count changes.     Correct (1, 2, 3...)
+
+===================================================================================================
+
+16. Dependency Misuse with Timer
+
+const [count, setCount] = useState(0);
+
+useEffect(() => {
+  const timer = setInterval(() => {
+    console.log("Tick:", count);
+  }, 1000);
+ 
+  return () => clearInterval(timer);
+}, []);
+Question:
+Will this log the updated count?
+Answer:
+•	 No. It captures the count at first render (closure issue).
+•	 Fix: Add count to dependency array or use ref.
+
+===================================================================================================
+
+17. JSX Injection & XSS Vulnerability
+// Assume userInput comes from a malicious source
+const userInput = '<h1>Hello</h1><script>alert("XSS")</script>';
+
+// Updated Component
+function Comment({ content }) {
+  return <div>{content}</div>;
+}
+Question: If the component uses the code above, is the application still vulnerable to XSS attacks?
+
+Answer:
+
+No, it is safe.
+
+Explanation: By default, React automatically escapes any string content rendered inside {} in JSX. The script tags will be rendered as literal text (&lt;script&gt;...), preventing execution.
+
+=================================================
+
+18. Custom Hook State Reset
+// A simple custom hook
+const useCounter = (initialValue = 0) => {
+  const [count, setCount] = useState(initialValue);
+  return [count, setCount];
+};
+
+// ChildComponent implementation:
+function ChildComponent({ initialValue }) {
+  // uses the prop to initialize state
+  const [count, setCount] = useCounter(initialValue); 
+  // ... rest of component
+}
+Question: If the parent changes the initialValue prop from 5 to 20 after the child has already rendered, will count update to 20?
+
+Answer:
+
+No. useState only uses the initial value argument (initialValue) during the first render. Subsequent changes to the prop are ignored by useState.
+
+Fix: Use a second useEffect hook inside ChildComponent to explicitly watch for changes and manually update state:
+
+useEffect(() => {
+  setCount(initialValue);
+}, [initialValue]);
+=================================================
+
+19. JavaScript Array delete Pitfall
+const fruits = ['apple', 'banana', 'cherry'];
+delete fruits[1];
+
+console.log(fruits.length);
+console.log(fruits[1]);
+Question: What will the console.log statements output, and what is the preferred ES6 method to remove elements from an array?
+
+Answer:
+
+fruits.length outputs: 3 (Length is unchanged).
+
+fruits[1] outputs: undefined (The element is removed, leaving a "hole" or sparse entry).
+
+Preferred Fix: Use the .splice() method (e.g., fruits.splice(1, 1)).
+
+========================================================================
+
+20. map() Without Keys Warning
+
+function List({ items }) {
+  return (
+    <ul>
+      {items.map((item) => (
+        <li>{item.name}</li>
+      ))}
+    </ul>
+  );
+}
+
+Question: What is the critical error in the code above?
+
+Answer:
+
+Critical Error: The list items are missing the required key prop.
+
+Impact: React cannot reliably track element identity when the list changes (items added/removed/reordered), leading to performance issues and potential state mix-ups.
+
+Fix: Use a stable, unique ID from the data:
+{items.map((item) => (<li key={item.id}>{item.name}</li>))}
+=================================================
+
+21. useMemo Misuse and Premature Optimization
+function Parent() {
+  const [count, setCount] = useState(0);
+
+  const calculatedValue = useMemo(() => {
+    // This isn't actually a costly calculation...
+    return count;
+  }, [count]);
+  
+  // ...
+}
+
+Question: In this code, is the use of useMemo helping performance? Why or why not?
+
+Answer:
+
+No, it is likely hurting performance (or at best, neutral).
+
+Explanation: useMemo adds overhead (dependency comparison, memory storage). Since the dependency array includes count, the useMemo callback runs on every single render anyway, and the calculation is trivial. The overhead outweighs the benefit.
+
+=================================================
+
+22. React Event Bubbling vs. event.stopPropagation()
+
+// Two nested event handlers
+<div onClick={() => console.log('Outer Click')}>
+  <button onClick={() => console.log('Inner Click')}>Click Me</button>
+</div>
+
+Question: When the "Click Me" button is pressed, what is logged, and how can we make sure only 'Inner Click' is logged?
+
+Answer:
+
+Output: Both 'Inner Click' and 'Outer Click' are logged (due to event bubbling).
+
+Fix: Use the event.stopPropagation() method inside the inner handler:
+<button onClick={(e) => { e.stopPropagation(); console.log('Inner Click'); }}>
+  Click Me
+</button>
+
+=================================================
+
+23. Scope of var, let, and const (JavaScript Core)
+
+for (var i = 0; i < 3; i++) {
+  setTimeout(() => console.log(i), 100);
+}
+
+Question: What is the output of this code, and how would you change it using ES6 keywords to make it output 0, 1, 2?
+
+Answer:
+
+Output: 3, 3, 3. (The var is function-scoped, capturing the final value of 3.)
+
+Fix: Change var to let:
+for (let i = 0; i < 3; i++) { ... }
+// 'let' is block-scoped, creating a fresh scope for each loop iteration.
+=================================================
+
+24. Missing Cleanup in useEffect with Object Dependency
+
+function DataFetcher({ query }) {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    let ignore = false;
+    
+    // Assume fetchById is an async function
+    fetchById(query.id).then(result => {
+      if (!ignore) {
+        setData(result);
+      }
+    });
+
+    // Cleanup function is missing!
+    // return () => {}; 
+  }, [query.id]); // Dependency array uses a nested property
+
+  // ... rest of component
+}
+
+Question: What two potential problems does the missing cleanup function create when the query.id changes rapidly?
+
+Answer:
+
+Problem 1: Race Condition (Stale Update): If the ID changes rapidly, the first, slower fetch might complete after the second, faster fetch. The slower result overwrites the newer data, causing the UI to briefly show stale information.
+
+Problem 2: Memory Leak (Minor): While React and modern browsers handle many memory leaks, the component might still hold references to variables (like setData) after it's unmounted, which is poor practice.
+
+Fix: Implement the cleanup function to set the ignore flag to true. This tells the asynchronous then block to abandon the update if the effect has been cleaned up (i.e., if the ID changed or the component unmounted).
+
+// Add the cleanup:
+return () => {
+  ignore = true; // Prevents calling setData on the outdated fetch
+};
+
+============================================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
