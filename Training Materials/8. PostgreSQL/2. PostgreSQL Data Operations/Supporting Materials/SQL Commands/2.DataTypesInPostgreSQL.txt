@@ -14,15 +14,18 @@ SELECT 'The quick brown fox jumps over the lazy dog.'::TEXT AS "UsingTEXT";
 -- Numeric
 -- ==================
 Three data types available in PostgreSQL:
-•	SMALLINT or INT2
-•	INTEGER or INT or INT4
-•	BIGINT or INT8
+•	SMALLINT or INT2 (2 bytes of storage)
+•	INTEGER or INT or INT4 (4 bytes of storage)
+•	BIGINT or INT8 (8 bytes of storage)
 
 SELECT 9.99::NUMERIC(8,3) AS "NumericValue";
 SELECT 999989999999.889999::NUMERIC AS "NumericValue";
 SELECT 99998.889999::NUMERIC(8,3) AS "NumericValue";
 SELECT 'NaN'::NUMERIC AS "Not-a-Number";
+
+REAL (or FLOAT4)
 SELECT 99998999.889999::REAL AS "RealValue";
+DOUBLE PRECISION (or FLOAT8)
 SELECT 99998999.889999::DOUBLE PRECISION AS "DoublePrecisionValue";
 
 SET lc_monetary = 'en_US.UTF-8'; -- Set the locale to match your money format
@@ -32,6 +35,10 @@ SELECT '$100,000.00'::MONEY AS "CTC";
 
 -- Boolean
 -- ================
+
+TRUE/FALSE=>can be represented as Y/N, 1/0, ON/OFF
+Unknown values can be represented as NULL
+
 SELECT 1::BOOLEAN AS "TrueValue", 0::BOOLEAN AS "FalseValue",NULL::BOOL  AS "Unknown";
 
 -- Date/Time

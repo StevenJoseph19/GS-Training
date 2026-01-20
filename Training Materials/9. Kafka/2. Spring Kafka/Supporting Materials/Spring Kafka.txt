@@ -12,19 +12,32 @@ wsl --distribution Ubuntu
 
 bin/kafka-server-start.sh config/server.properties
 
-WSL2 IP:
-=========
+WSL2 IP (for server.properties=>advertised listener)
+==================================================
+hostname -I
+
+OR
+===
 # ip addr | grep eth0 - just for reference
 ip addr | grep inet
-==>  172.26.245.121
+==> 172.26.250.220
+
+The PowerShell "Quick Finder"
+==========================
+wsl hostname -I
+
+Update "advertised listeners" in config/server.properties
+=========================================================
+Then stop and restart only Kafka server
+=========================================================
 
 Check if IPv6 is enabled or disabled, from a terminal window: 
 ===========================================================
 
-cat /proc/sys/net/ipv6/conf/all/disable_ipv6 
+$ cat /proc/sys/net/ipv6/conf/all/disable_ipv6 
 
 if it is '0'
-sudo sysctl -p -- If it is already set in configuration file.
+sudo sysctl -p -- If it is already set in configuration file. This will activate the settings.
 
 Otherwise
 =========
@@ -34,21 +47,34 @@ net.ipv6.conf.lo.disable_ipv6=1
 net.ipv6.conf.default.disable_ipv6=1
 net.ipv6.conf.all.disable_ipv6=1
 
+Verify Connectivity (Windows side)
+Before writing any Spring Boot code, check if Windows can actually see Kafka. 
+Open PowerShell on Windows and type:
+=========================================================
+Test-NetConnection -ComputerName 172.22.x.x -Port 9092 
+# Test-NetConnection is a PowerShell-specific tool.
+
+OR
+===
+telnet 172.22.x.x 9092
+# Windows Command Prompt
+# If the connection succeeds, the screen will go blank (connected).
+======================================================
 
 List Topics 
 =============
 
-bin/kafka-topics.sh --list --bootstrap-server  172.26.245.121:9092
+bin/kafka-topics.sh --list --bootstrap-server 172.22.36.65:9092
                                              <-advertised listener - same as in config/server.properties -->
 
 Delete Topic
 ================
-bin/kafka-topics.sh --delete --topic notifications --bootstrap-server  172.26.242.23:9092
+bin/kafka-topics.sh --delete --topic notifications --bootstrap-server  172.22.41.230:9092
 
 
 Display messages in topic
 ======================
-bin/kafka-console-consumer.sh --bootstrap-server  172.26.245.121:9092 --topic notifications --from-beginning
+bin/kafka-console-consumer.sh --bootstrap-server 172.26.250.220:9092 --topic notifications --from-beginning
 
 
  netstat -an | grep 9092
@@ -65,7 +91,7 @@ POST Request
 =================
 # curl -X POST http://<Windows_IP>:8181/api/notifications -H "Content-Type: text/plain" -d "Hello from Notification Service"
 
-curl -X POST http://172.26.240.1:8083/api/notifications -H "Content-Type: text/plain" -d "Hello from Notification Service "
+curl -X POST http://172.26.240.1:8181/api/notifications -H "Content-Type: text/plain" -d "Hello from Notification Service"
 
 
 Stop Kafka Server

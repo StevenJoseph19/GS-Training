@@ -111,7 +111,7 @@ ls
 
 cd  kafka_2.13-3.0.0
 
-bin/kafka-topics.sh --bootstrap-server localhost:9092 --list my_topic 
+bin/kafka-topics.sh --bootstrap-server localhost:9092 --list 
 
 bin/kafka-console-producer.sh --broker-list localhost:9092 --topic my_topic -- Deprecated
 
@@ -121,6 +121,11 @@ bin/kafka-console-producer.sh --bootstrap-server localhost:9092 --topic my_topic
 >MyMessage 2
 >MyMessage 3
 >Anything goes here...
+
+Delete the topic
+=====================
+
+bin/kafka-topics.sh --delete --topic my_topic --bootstrap-server localhost:9092
 
 
 Shell 3 => 
@@ -164,7 +169,7 @@ cd ~
 
 cd kafka_2.13-3.0.0
 
-bin/kafka-server-stop.sh
+./bin/kafka-server-stop.sh
 
 Then shut down the ZooKeeper server: Once all Kafka brokers are stopped, you can safely stop ZooKeeper.
 =========================================================================================================
@@ -172,7 +177,7 @@ Shutting Down ZooKeeper
 =============================
 Stop the ZooKeeper server by running the following command in the terminal:
 
-bin/zookeeper-server-stop.sh
+./bin/zookeeper-server-stop.sh
 
 ===================================================================================
 
