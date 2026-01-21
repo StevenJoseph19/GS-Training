@@ -27,6 +27,9 @@ The PowerShell "Quick Finder"
 wsl hostname -I
 
 Update "advertised listeners" in config/server.properties
+========================================================
+sudo nano config/server.properties
+
 =========================================================
 Then stop and restart only Kafka server
 =========================================================
@@ -34,9 +37,10 @@ Then stop and restart only Kafka server
 Check if IPv6 is enabled or disabled, from a terminal window: 
 ===========================================================
 
-$ cat /proc/sys/net/ipv6/conf/all/disable_ipv6 
+cat /proc/sys/net/ipv6/conf/all/disable_ipv6 
 
-if it is '0'
+If it is '0'
+==============
 sudo sysctl -p -- If it is already set in configuration file. This will activate the settings.
 
 Otherwise
@@ -60,11 +64,35 @@ telnet 172.22.x.x 9092
 # Windows Command Prompt
 # If the connection succeeds, the screen will go blank (connected).
 ======================================================
+Script to override advertised listeners
+======================================================
+# Create a simple shortcut script inside their Ubuntu home folder.
 
+# Create the file: nano start-kafka.sh
+
+# Paste the command:
+
+#!/bin/bash
+IP=$(hostname -I | awk '{print $1}')
+echo "Starting Kafka with IP: $IP"
+~/kafka_2.13-3.0.0/bin/kafka-server-start.sh ~/kafka_2.13-3.0.0/config/server.properties \
+--override advertised.listeners=PLAINTEXT://$IP:9092
+
+Make it runnable: chmod +x start-kafka.sh
+
+Type ./start-kafka.sh 
+
+# Run your PowerShell test again: 
+
+Test-NetConnection -ComputerName 172.22.x.x -Port 9092.
+
+# zookeeper must be running first.
+
+================================================================
 List Topics 
 =============
 
-bin/kafka-topics.sh --list --bootstrap-server 172.22.36.65:9092
+bin/kafka-topics.sh --list --bootstrap-server 172.22.45.6:9092
                                              <-advertised listener - same as in config/server.properties -->
 
 Delete Topic
@@ -76,11 +104,20 @@ Display messages in topic
 ======================
 bin/kafka-console-consumer.sh --bootstrap-server 172.26.250.220:9092 --topic notifications --from-beginning
 
+Diagnostics
+===============================
 
  netstat -an | grep 9092
 
+If netstat shows LISTEN but Java fails: It's a Windows Firewall or IP/Network issue.
+
+If netstat shows NOTHING: It's an Ubuntu/Kafka startup issue (likely ZooKeeper isn't running or server.properties has an error).
+
+=============================================================
+Testing the reverse communication path (Ubuntu -> Windows).
+============================================================
 To find the Windows IP accessible from WSL2
-============================================
+============================================================
 cat /etc/resolv.conf | grep nameserver
 Or
 ==
@@ -89,11 +126,12 @@ ip route | grep default
 
 POST Request
 =================
-# curl -X POST http://<Windows_IP>:8181/api/notifications -H "Content-Type: text/plain" -d "Hello from Notification Service"
 
-curl -X POST http://172.26.240.1:8181/api/notifications -H "Content-Type: text/plain" -d "Hello from Notification Service"
+curl -X POST http://<Windows_IP>:8081/orders \
+  -H "Content-Type: application/json" \
+  -d '{"productId": 2, "price": 150.0}'
 
-
+=====================
 Stop Kafka Server
 =====================
 pkill -f kafka.Kafka
@@ -102,6 +140,7 @@ Stop Kafka Zookeeper
 =====================
 
 pkill -f zookeeper
+===========================================================================================
 
 
 
