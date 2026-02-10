@@ -1,0 +1,17 @@
+{
+  "name": "gs-engineering-mastery",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "test:ex": "jest exercises/",
+    "test:labs": "jest labs/"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "jest": "^30.2.0"
+  }
+}
